@@ -1,3 +1,0 @@
-config:
-  gcp:project: spotify-portal-public-demo
-  gcp:region: ${{ values.region }}

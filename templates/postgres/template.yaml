@@ -101,6 +101,7 @@ spec:
       action: fetch:template
       input:
         url: ./skeleton
+        targetPath: divisions/${{ parameters.division }}
         values:
           component_id: ${{ parameters.component_id }}
           description: ${{ parameters.description }}
@@ -129,7 +130,6 @@ spec:
           **PostgreSQL Version:** ${{ parameters.database_version }}
           **Owner:** ${{ parameters.owner }}
           **Description:** ${{ parameters.description }}
-        targetPath: divisions/${{ parameters.division }}
 
   output:
     links:

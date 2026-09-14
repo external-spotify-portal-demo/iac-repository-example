@@ -3,15 +3,17 @@ import pulumi_gcp as gcp
 
 
 class PostgresDatabase(pulumi.ComponentResource):
-    def __init__(self, name: str, opts=None, **kwargs):
+    def __init__(
+        self,
+        name: str,
+        region: str = "europe-west1",
+        tier: str = "db-custom-2-8192",
+        database_version: str = "POSTGRES_15",
+        disk_size: int = 50,
+        database_name: str = "app",
+        opts=None,
+    ):
         super().__init__("custom:database:PostgresDatabase", name, None, opts)
-
-        config = pulumi.Config("postgres")
-        region = config.get("region") or "europe-west1"
-        tier = config.get("tier") or "db-custom-2-8192"
-        database_version = config.get("databaseVersion") or "POSTGRES_15"
-        disk_size = config.get_int("diskSize") or 50
-        database_name = config.get("databaseName") or "app"
 
         self.instance = gcp.sql.DatabaseInstance(
             f"{name}-instance",
