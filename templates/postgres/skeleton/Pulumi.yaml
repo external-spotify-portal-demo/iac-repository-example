@@ -1,0 +1,3 @@
+name: ${{ values.division }}
+runtime: python
+description: Infrastructure for the ${{ values.division }} division

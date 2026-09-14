@@ -1,0 +1,6 @@
+config:
+  postgres:region: europe-west1
+  postgres:tier: db-custom-2-8192
+  postgres:databaseVersion: POSTGRES_15
+  postgres:diskSize: "50"
+  postgres:databaseName: app

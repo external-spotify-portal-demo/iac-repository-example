@@ -1,0 +1,6 @@
+config:
+  postgres:region: ${{ values.region }}
+  postgres:tier: ${{ values.tier }}
+  postgres:databaseVersion: ${{ values.database_version }}
+  postgres:diskSize: "${{ values.disk_size }}"
+  postgres:databaseName: ${{ values.database_name }}

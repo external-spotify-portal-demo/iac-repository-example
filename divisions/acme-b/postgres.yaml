@@ -1,0 +1,6 @@
+config:
+  postgres:region: us-central1
+  postgres:tier: db-custom-4-16384
+  postgres:databaseVersion: POSTGRES_15
+  postgres:diskSize: "100"
+  postgres:databaseName: app

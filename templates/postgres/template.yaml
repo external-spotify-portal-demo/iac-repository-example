@@ -1,0 +1,148 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: gcp-postgres-template
+  title: GCP - PostgreSQL Database
+  description: Add a new Cloud SQL PostgreSQL database to a division in the central IaC repository
+  tags:
+    - infra
+    - pulumi
+    - gcp
+    - postgres
+spec:
+  owner: group:portal/admins
+  type: database
+
+  parameters:
+    - title: About
+      required:
+        - component_id
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: The unique name of the database instance
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Description of the database
+
+    - title: Ownership
+      required:
+        - owner
+      properties:
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the database
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              - kind: [Group, User]
+
+    - title: Division
+      required:
+        - division
+      properties:
+        division:
+          title: Division
+          type: string
+          description: The division this database belongs to
+          enum:
+            - acme-a
+            - acme-b
+
+    - title: Configuration
+      required:
+        - region
+        - tier
+        - database_name
+      properties:
+        region:
+          title: GCP Region
+          type: string
+          description: GCP region for the database
+          enum:
+            - europe-west1
+            - us-central1
+            - asia-east1
+        tier:
+          title: Instance Tier
+          type: string
+          description: Cloud SQL machine tier
+          enum:
+            - db-custom-1-4096
+            - db-custom-2-8192
+            - db-custom-4-16384
+          default: db-custom-2-8192
+        disk_size:
+          title: Disk Size (GB)
+          type: number
+          description: Disk size in GB
+          default: 50
+        database_name:
+          title: Database Name
+          type: string
+          description: Name of the database to create
+          default: app
+        database_version:
+          title: PostgreSQL Version
+          type: string
+          description: PostgreSQL version
+          enum:
+            - POSTGRES_15
+            - POSTGRES_16
+          default: POSTGRES_15
+
+  steps:
+    - id: template
+      name: Fetch Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          component_id: ${{ parameters.component_id }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          division: ${{ parameters.division }}
+          region: ${{ parameters.region }}
+          tier: ${{ parameters.tier }}
+          disk_size: ${{ parameters.disk_size }}
+          database_name: ${{ parameters.database_name }}
+          database_version: ${{ parameters.database_version }}
+
+    - id: publish
+      name: Create Pull Request
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?repo=iac-repository-example&owner=external-spotify-portal-demo
+        title: "Add PostgreSQL database: ${{ parameters.component_id }} (${{ parameters.division }})"
+        branchName: add-postgres-${{ parameters.component_id }}
+        description: |
+          This PR adds a new PostgreSQL database `${{ parameters.component_id }}` to the `${{ parameters.division }}` division.
+
+          **Region:** ${{ parameters.region }}
+          **Tier:** ${{ parameters.tier }}
+          **Disk Size:** ${{ parameters.disk_size }} GB
+          **Database Name:** ${{ parameters.database_name }}
+          **PostgreSQL Version:** ${{ parameters.database_version }}
+          **Owner:** ${{ parameters.owner }}
+          **Description:** ${{ parameters.description }}
+        targetPath: divisions/${{ parameters.division }}
+
+  output:
+    links:
+      - title: Pull Request
+        url: ${{ steps.publish.output.remoteUrl }}
+    text:
+      - title: Next Steps
+        content: |-
+          A Pull Request has been created to add the PostgreSQL database **${{ parameters.component_id }}** to the **${{ parameters.division }}** division.
+
+          Once the PR is reviewed and merged, Pulumi will automatically provision your database.
+
+          After provisioning, connect using:
+          ```
+          gcloud sql connect ${{ parameters.component_id }} --user=postgres --project=spotify-portal-public-demo
+          ```
